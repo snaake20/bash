@@ -8,14 +8,26 @@ csv="baza.txt"
 stergere(){
   clear
   read -p "Introdu id-ul studentului de sters: " id
-  ((id++))
-  sed -i "$id d" $csv
+  sed -i "/^$id/d" $csv
   return
 }
 
-# editare(){
-  
-# }
+editare(){
+  clear
+  read -p "Introduceti id-ul studentului a carui date urmeaza sa fie actualizate: " existingId
+  repl=$(sed -n -e "/^$existingId/p" $csv) #te am gasit hehe
+  echo $repl
+  read -p "Introdu campurile noi lipite urmate de ',' (fara id): " str
+  while [[ ! $str =~ ^[a-zA-Z]{2,},([1-9]|10),(([A-Za-z0-9]+((\.|\-|\_|\+)?[A-Za-z0-9]?)*[A-Za-z0-9]+)|[A-Za-z0-9]+)@(([A-Za-z0-9]+)+((\.|\-|\_)?([A-Za-z0-9]+)+)*)+\.([A-Za-z]{2,})+$ ]]
+  do
+    echo "ai introdus campurile gresit"
+    read -p "Introdu campurile noi lipite urmate de ',' (fara id)" str
+  done
+  final=$existingId','$str
+  # echo $final
+  sed -i -e "s/$repl/$final/" $csv
+  return  
+}
 
 adaugare(){
   clear
@@ -92,7 +104,7 @@ init(){
   return
 }
 
-# init
+init
 
 echo -e "Operatii disponibile: \n
 'afisare' - afisare csv,\n
