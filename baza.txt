@@ -1,6 +1,8 @@
 ID,nume,nota SO,email
 1,Mihai,7,mihai@ase.ro
 2,Stefania,9,stefania@ase.ro
+4,scooby,10,scooby@d.oo
 3,Radu,6,radu@gmail.com
 5,Natalia,10,nat@gmail.com
-6,Heath,10,heath@ledger.com
+6,Christian,10,Chris@ba.le
+7,Jack,9,jack@sparr.ow

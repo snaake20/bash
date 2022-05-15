@@ -1,5 +1,6 @@
 #!/bin/bash
 csv="baza.txt"
+bigReg="^[a-zA-Z]{2,},([1-9]|10),(([A-Za-z0-9]+((\.|\-|\_|\+)?[A-Za-z0-9]?)*[A-Za-z0-9]+)|[A-Za-z0-9]+)@(([A-Za-z0-9]+)+((\.|\-|\_)?([A-Za-z0-9]+)+)*)+\.([A-Za-z]{2,})+$"
 
 # sortare(){
 
@@ -8,17 +9,24 @@ csv="baza.txt"
 stergere(){
   clear
   read -p "Introdu id-ul studentului de sters: " id
-  sed -i "/^$id/d" $csv
+  if [[ ! $(sed -n -e "/^$id/p" $csv) ]]
+  then
+    echo "id-ul nu a fost gasit"
+  else
+    sed -i "/^$id/d" $csv
+  fi
   return
 }
 
 editare(){
   clear
   read -p "Introduceti id-ul studentului a carui date urmeaza sa fie actualizate: " existingId
-  repl=$(sed -n -e "/^$existingId/p" $csv) #te am gasit hehe
-  echo $repl
-  read -p "Introdu campurile noi lipite urmate de ',' (fara id): " str
-  while [[ ! $str =~ ^[a-zA-Z]{2,},([1-9]|10),(([A-Za-z0-9]+((\.|\-|\_|\+)?[A-Za-z0-9]?)*[A-Za-z0-9]+)|[A-Za-z0-9]+)@(([A-Za-z0-9]+)+((\.|\-|\_)?([A-Za-z0-9]+)+)*)+\.([A-Za-z]{2,})+$ ]]
+  if [[ $(sed -n -e "/^$existingId/p" $csv) ]]
+  then
+    repl=$(sed -n -e "/^$existingId/p" $csv) #te am gasit hehe
+    echo $repl
+    read -p "Introdu campurile noi lipite urmate de ',' (fara id): " str
+  while [[ ! $str =~ $bigReg ]]
   do
     echo "ai introdus campurile gresit"
     read -p "Introdu campurile noi lipite urmate de ',' (fara id)" str
@@ -26,6 +34,32 @@ editare(){
   final=$existingId','$str
   # echo $final
   sed -i -e "s/$repl/$final/" $csv
+  else
+    echo "id-ul nu exista"
+    len=$(awk 'END { print NR }' $csv)
+    ((len--))
+    if [[ $existingId < $len ]]
+    then
+      echo "...dar se poate adauga :)"
+      read -p "1 - 'da', 2 - 'nu': " inp
+      if [[ inp -eq "1" ]]
+      then
+        read -p "Introdu campurile noi lipite urmate de ',' (fara id): " str
+        while [[ ! $str =~ $bigReg ]]
+        do
+          echo "ai introdus campurile gresit"
+          read -p "Introdu campurile noi lipite urmate de ',' (fara id)" str
+        done
+        final=$existingId','$str
+        ((existingId--))
+        sed -i "$existingId a $final" $csv
+      else
+        break
+      fi
+    else
+      echo "... si nici nu se poate adauga"
+    fi
+  fi
   return  
 }
 
@@ -104,12 +138,12 @@ init(){
   return
 }
 
-init
+# init
 
 echo -e "Operatii disponibile: \n
 'afisare' - afisare csv,\n
 'adaugare' - adaugare student,\n
-'editare' - editare studenti urmat de id,\n
+'editare' - editare/inserare ;) studenti urmat de id,\n
 'stergere' - stergere studenti urmat de id,\n
 'sortare' - sortare studenti descrescator in functie de nota (afisare primii 3),\n
 '*orice altceva*' - pt a inchide scriptul"
@@ -127,13 +161,9 @@ do
   echo -e "Operatii disponibile: \n
   'afisare' - afisare csv,\n
   'adaugare' - adaugare student,\n
-  'editare' - editare studenti urmat de id,\n
+  'editare' - editare/inserare ;) studenti urmat de id,\n
   'stergere' - stergere studenti urmat de id,\n
   'sortare' - sortare studenti descrescator in functie de nota (afisare primii 3),\n
   '*orice altceva*' - pt a inchide scriptul"
   read -p "Introduceti operatia dorita: " inp
 done
-
-
-
-
