@@ -68,7 +68,12 @@ adaugare(){
   while IFS="," read -r id nume nota mail #IFS = internal field separator
     do
     #   echo -e "$id $nume $nota $mail"
-      newId=$((id+1))
+      if [[ $id =~ ^[1-9]+$]]
+      then
+        newId=$((id+1))
+      else
+        newId=0
+      fi
   done < <(tail -n -1 $csv)
   read -p "Introduceti numele: " nume
   while [[ ! "$nume" =~ ^[a-zA-Z]{2,}$ ]]
