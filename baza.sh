@@ -38,6 +38,8 @@ editare(){
   sed -i -e "s/$repl/$final/" $csv
   else
     echo "id-ul nu exista"
+    len=$(awk 'END { print NR }' $csv)
+    ((len--))
     id=$(awk -F',' 'END { print $1 }' $csv)
     # echo $id
     # echo $existingId
@@ -54,9 +56,15 @@ editare(){
           read -p "Introdu campurile noi lipite urmate de ',' (fara id)" str
         done
         final=$existingId','$str
-        sed -i "$existingId a $final" $csv
+        if [[ $existingId -gt $len ]]
+        then
+          sed -i "$len a $final" $csv
+        else
+          ((existingId--))
+          sed -i "$existingId a $final" $csv
+        fi
       else
-        exit
+        return
       fi
     else
       echo "... si nici nu se poate adauga"
