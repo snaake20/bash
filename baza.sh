@@ -38,9 +38,10 @@ editare(){
   sed -i -e "s/$repl/$final/" $csv
   else
     echo "id-ul nu exista"
-    len=$(awk 'END { print NR }' $csv)
-    ((len--))
-    if [[ $existingId < $len ]]
+    id=$(awk -F',' 'END { print $1 }' $csv)
+    # echo $id
+    # echo $existingId
+    if [[ $existingId -lt $id ]]
     then
       echo "...dar se poate adauga :)"
       read -p "1 - 'da', 2 - 'nu': " inp
