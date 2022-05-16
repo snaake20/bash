@@ -106,44 +106,19 @@ afisare(){
   done < <(tail -n +1 $csv) 
 }
 
-sleepy() {
-	sleep 1
-    # perc=$1*25
-    if [[ $1 -eq 4 ]]
-    then
-      echo "Loading: 99%"
-    else
-	  echo "Loading: $(($1*25))%"
-    fi
-	return
-}
-
-loading(){
-  for ((i=0; i<5; i++))
-  do
-    sleepy $i #& #comparat cu varianta fara & # sync vs async
-  done
-  sleep 1
-  echo "Loading: DONE!!!"
-  sleep 2
-  clear
-  return
-}
-
 init() {
   echo -e "Pseudo-baza de date :)\n"
   echo -e "----------------------\n"
   if [[ ! -f $csv ]]
   then
-    echo "fisierul nu exista, dar va fi creat" # 1 creeare fisier CSV
-    touch $csv
+    echo "fisierul nu exista, dar va fi creat" # 1 creare fisier CSV
+    # touch $csv
     echo "ID,nume,nota SO,email" > $csv
-    loading
   fi
   return
 }
 
-# init
+init
 
 echo -e "Operatii disponibile: \n
 'afisare' - afisare csv,\n
