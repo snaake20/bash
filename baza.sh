@@ -1,10 +1,12 @@
 #!/bin/bash
-csv="baza.txt"
+csv="baza.csv"
 bigReg="^[a-zA-Z]{2,},([1-9]|10),(([A-Za-z0-9]+((\.|\-|\_|\+)?[A-Za-z0-9]?)*[A-Za-z0-9]+)|[A-Za-z0-9]+)@(([A-Za-z0-9]+)+((\.|\-|\_)?([A-Za-z0-9]+)+)*)+\.([A-Za-z]{2,})+$"
 
-# sortare(){
 
-# }
+sortare(){
+  clear
+  awk -F',' '{ if (NR>1) print $3 "\t" $2}' $csv | sort -n -r | head -n 3
+}
 
 stergere(){
   clear
@@ -51,7 +53,7 @@ editare(){
           read -p "Introdu campurile noi lipite urmate de ',' (fara id)" str
         done
         final=$existingId','$str
-        ((existingId--))
+        # ((existingId--))
         sed -i "$existingId a $final" $csv
       else
         exit
@@ -68,11 +70,11 @@ adaugare(){
   while IFS="," read -r id nume nota mail #IFS = internal field separator
     do
     #   echo -e "$id $nume $nota $mail"
-      if [[ ! $id =~ ^[0-9]+$ ]]
+      if [[ $id =~ ^[0-9]+$ ]]
       then
-        newId=1
-      else
         newId=$((id+1))
+      else
+        newId=1
       fi
   done < <(tail -n -1 $csv)
   read -p "Introduceti numele: " nume
@@ -159,6 +161,7 @@ do
   adaugare) adaugare;;
   editare) editare;;
   stergere) stergere;;
+  sortare) sortare;;
   *) exit 1;;
   esac
   echo -e "Operatii disponibile: \n

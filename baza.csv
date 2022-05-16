@@ -1,7 +1,9 @@
-ID,nume,nota SO,email
+ID,nume,nota,email
 1,Mihai,7,mihai@ase.ro
 2,Stefania,9,stefania@ase.ro
 3,Radu,6,radu@gmail.com
+4,jjj,6,jjj@jj.jj
 5,Natalia,10,nat@gmail.com
-6,Christian,10,Chris@ba.le
-7,Jack,9,jack@sparr.ow
+6,Max,8,max@ma.xe
+7,Max,7,Max@max.xx
+8,Andrei,10,andrei@ro.su
