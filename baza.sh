@@ -54,7 +54,7 @@ editare(){
         ((existingId--))
         sed -i "$existingId a $final" $csv
       else
-        break
+        exit
       fi
     else
       echo "... si nici nu se poate adauga"
@@ -68,11 +68,11 @@ adaugare(){
   while IFS="," read -r id nume nota mail #IFS = internal field separator
     do
     #   echo -e "$id $nume $nota $mail"
-      if [[ $id =~ ^[1-9]+$ ]]
+      if [[ ! $id =~ ^[0-9]+$ ]]
       then
-        newId=$((id+1))
-      else
         newId=1
+      else
+        newId=$((id+1))
       fi
   done < <(tail -n -1 $csv)
   read -p "Introduceti numele: " nume
@@ -128,7 +128,7 @@ loading(){
   return
 }
 
-init(){
+init() {
   echo -e "Pseudo-baza de date :)\n"
   echo -e "----------------------\n"
   if [[ ! -f $csv ]]
@@ -136,8 +136,6 @@ init(){
     echo "fisierul nu exista, dar va fi creat" # 1 creeare fisier CSV
     touch $csv
     echo "ID,nume,nota SO,email" > $csv
-    loading
-  else
     loading
   fi
   return
