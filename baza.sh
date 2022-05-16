@@ -53,7 +53,6 @@ editare(){
           read -p "Introdu campurile noi lipite urmate de ',' (fara id)" str
         done
         final=$existingId','$str
-        # ((existingId--))
         sed -i "$existingId a $final" $csv
       else
         exit
