@@ -60,9 +60,10 @@ editare(){
         if [[ $existingId -gt $len ]]
         then
           # echo "not yet implemented"
-          poz=$(awk -v sid="$existingId" -F',' '{if(NR>1 && sid < $1) print NR}' $csv)
-          # echo $poz
+          str=$(awk -v sid="$existingId" -F',' '{if(NR>1 && sid < $1) print NR}' $csv)
+          poz=${str::1}
           ((poz--))
+          # echo $poz
           sed -i "$poz a $final" $csv
         else
           ((existingId--))
