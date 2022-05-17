@@ -24,6 +24,11 @@ stergere(){
 editare(){
   clear
   read -p "Introduceti id-ul studentului a carui date urmeaza sa fie actualizate: " existingId
+  while [[ ! $existingId =~ ^[0-9]+$ ]]
+  do
+    echo "id invalida"
+    read -p "Reintroduceti id-ul: " nota
+  done
   if [[ $(sed -n -e "/^$existingId/p" $csv) ]]
   then
     repl=$(sed -n -e "/^$existingId/p" $csv) #te am gasit hehe
@@ -66,7 +71,7 @@ editare(){
           # echo $poz
           sed -i "$poz a $final" $csv
         else
-          ((existingId--))
+          # ((existingId++))
           sed -i "$existingId a $final" $csv
         fi
       else
@@ -81,16 +86,23 @@ editare(){
 
 adaugare(){
   clear
-  while IFS="," read -r id nume nota mail #IFS = internal field separator
-    do
-    #   echo -e "$id $nume $nota $mail"
-      if [[ $id =~ ^[0-9]+$ ]]
-      then
-        newId=$((id+1))
-      else
-        newId=1
-      fi
-  done < <(tail -n -1 $csv)
+  # while IFS="," read -r id nume nota mail #IFS = internal field separator
+  #   do
+  #   #   echo -e "$id $nume $nota $mail"
+  #     if [[ $id =~ ^[0-9]+$ ]]
+  #     then
+  #       newId=$((id+1))
+  #     else
+  #       newId=1
+  #     fi
+  # done < <(tail -n -1 $csv)
+  id=$(awk -F',' 'END { print $1 }' $csv)
+  if [[ $id =~ ^[0-9]+$ ]]
+  then
+    newId=$((id+1))
+  else
+    newId=1
+  fi
   read -p "Introduceti numele: " nume
   while [[ ! "$nume" =~ ^[a-zA-Z]{2,}$ ]]
   do
