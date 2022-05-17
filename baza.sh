@@ -16,6 +16,7 @@ stergere(){
     echo "id-ul nu a fost gasit"
   else
     sed -i "/^$id/d" $csv
+    echo "student sters"
   fi
   return
 }
@@ -58,7 +59,11 @@ editare(){
         final=$existingId','$str
         if [[ $existingId -gt $len ]]
         then
-          sed -i "$len a $final" $csv
+          # echo "not yet implemented"
+          poz=$(awk -v sid="$existingId" -F',' '{if(NR>1 && sid < $1) print NR}' $csv)
+          # echo $poz
+          ((poz--))
+          sed -i "$poz a $final" $csv
         else
           ((existingId--))
           sed -i "$existingId a $final" $csv
