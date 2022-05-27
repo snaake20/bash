@@ -21,6 +21,25 @@ stergere(){
   return
 }
 
+editareNume(){
+  read -p "noul nume: " replace
+  pozi=$1+1
+  # sed -i -e '${1} s/^[a-zA-Z]{2,}$/$replace/' $csv
+  awk -F','
+}
+
+editareNota(){
+  read -p "noua nota: " replace
+  pozi=$1+1
+  echo $replace
+  sed -i -E -e "$pozi s/\,^([1-9]|10)\b\,/,$replace,/" $csv
+}
+
+editareMail(){
+  read -p "noul mail: " replace
+  sed -i -e "$1s/\,\,\^(([A-Za-z0-9]+((\.|\-|\_|\+)?[A-Za-z0-9]?)*[A-Za-z0-9]+)|[A-Za-z0-9]+)@(([A-Za-z0-9]+)+((\.|\-|\_)?([A-Za-z0-9]+)+)*)+\.([A-Za-z]{2,})+$/$replace/" $csv
+}
+
 editare(){
   clear
   read -p "Introduceti id-ul studentului a carui date urmeaza sa fie actualizate: " existingId
@@ -29,18 +48,30 @@ editare(){
     echo "id invalida"
     read -p "Reintroduceti id-ul: " nota
   done
-  if [[ $(sed -n -e "/^$existingId/p" $csv) ]]
+  if [[ $(sed -n -e "/^$existingId\b/p" $csv) ]]
   then
-    repl=$(sed -n -e "/^$existingId/p" $csv) #te am gasit hehe
+    repl=$(sed -n -e "/^$existingId\b/p" $csv) #te am gasit hehe
     echo $repl
+    # echo -e "Introdu operatia de actualizare:\n
+    # '1' - editare nume,\n
+    # '2' - editare nota,\n
+    # '3' - editare mail,\n
+    # (*orice altceva) - exit 1"
+    # read -p "Introduceti operatia dorita: " str
+    # case "$str" in
+    # 1) editareNume $existingId;;
+    # 2) editareNota $existingId;;
+    # 3) editareMail $existingId;;
+    # *) exit 1;;
+    # esac
     read -p "Introdu campurile noi lipite urmate de ',' (fara id): " str
-  while [[ ! $str =~ $bigReg ]]
-  do
-    echo "ai introdus campurile gresit"
-    read -p "Introdu campurile noi lipite urmate de ',' (fara id)" str
-  done
+        while [[ ! $str =~ $bigReg ]]
+        do
+          echo "ai introdus campurile gresit"
+          read -p "Introdu campurile noi lipite urmate de ',' (fara id)" str
+        done
   final=$existingId','$str
-  # echo $final
+  echo $final
   sed -i -e "s/$repl/$final/" $csv
   else
     echo "id-ul nu exista"
@@ -62,18 +93,12 @@ editare(){
           read -p "Introdu campurile noi lipite urmate de ',' (fara id)" str
         done
         final=$existingId','$str
-        if [[ $existingId -gt $len ]]
-        then
           # echo "not yet implemented"
           str=$(awk -v sid="$existingId" -F',' '{if(NR>1 && sid < $1) print NR}' $csv)
           poz=${str::1}
           ((poz--))
           # echo $poz
           sed -i "$poz a $final" $csv
-        else
-          # ((existingId++))
-          sed -i "$existingId a $final" $csv
-        fi
       else
         return
       fi
@@ -86,16 +111,6 @@ editare(){
 
 adaugare(){
   clear
-  # while IFS="," read -r id nume nota mail #IFS = internal field separator
-  #   do
-  #   #   echo -e "$id $nume $nota $mail"
-  #     if [[ $id =~ ^[0-9]+$ ]]
-  #     then
-  #       newId=$((id+1))
-  #     else
-  #       newId=1
-  #     fi
-  # done < <(tail -n -1 $csv)
   id=$(awk -F',' 'END { print $1 }' $csv)
   if [[ $id =~ ^[0-9]+$ ]]
   then
@@ -147,30 +162,30 @@ init() {
 init
 
 echo -e "Operatii disponibile: \n
-'afisare' - afisare csv,\n
-'adaugare' - adaugare student,\n
-'editare' - editare/inserare ;) studenti urmat de id,\n
-'stergere' - stergere studenti urmat de id,\n
-'sortare' - sortare studenti descrescator in functie de nota (afisare primii 3),\n
+'1' - afisare csv,\n
+'2' - adaugare student,\n
+'3' - editare/inserare ;) studenti urmat de id,\n
+'4' - stergere studenti urmat de id,\n
+'5' - sortare studenti descrescator in functie de nota (afisare primii 3),\n
 '*orice altceva*' - pt a inchide scriptul"
 read -p "Introduceti operatia dorita: " inp
 
 while true
 do
-  case "$inp" in
-  afisare) afisare;;
-  adaugare) adaugare;;
-  editare) editare;;
-  stergere) stergere;;
-  sortare) sortare;;
+  case $inp in
+  1) afisare;;
+  2) adaugare;;
+  3) editare;;
+  4) stergere;;
+  5) sortare;;
   *) exit 1;;
   esac
   echo -e "Operatii disponibile: \n
-  'afisare' - afisare csv,\n
-  'adaugare' - adaugare student,\n
-  'editare' - editare/inserare ;) studenti urmat de id,\n
-  'stergere' - stergere studenti urmat de id,\n
-  'sortare' - sortare studenti descrescator in functie de nota (afisare primii 3),\n
+  '1' - afisare csv,\n
+  '2' - adaugare student,\n
+  '3' - editare/inserare ;) studenti urmat de id,\n
+  '4' - stergere studenti urmat de id,\n
+  '5' - sortare studenti descrescator in functie de nota (afisare primii 3),\n
   '*orice altceva*' - pt a inchide scriptul"
   read -p "Introduceti operatia dorita: " inp
 done
