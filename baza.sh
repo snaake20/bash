@@ -5,8 +5,20 @@ bigReg="^[a-zA-Z]{2,},([1-9]|10),(([A-Za-z0-9]+((\.|\-|\_|\+)?[A-Za-z0-9]?)*[A-Z
 
 sortare(){
   clear
-  note=$(awk -F',' '{ if (NR>1) print $3 $2}' $csv | sort -n -r)
-  echo $note
+  # note=()
+  # note+=$(awk -F',' '{ if (NR>1) print $3}' $csv)
+  # nume=()
+  # nume+=$(awk -F',' '{ if (NR>1) print $2}' $csv)
+  # for i in $note
+  # do
+  #   echo $i
+  # done
+  # for j in $nume
+  # do
+  #   echo $j
+  # done
+  awk -F',' '{ if (NR>1) print $3 "\t" $2}' $csv | sort -n -r | head -n 3
+  
   return
 }
 
