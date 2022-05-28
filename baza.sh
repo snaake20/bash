@@ -1,7 +1,5 @@
 #!/bin/bash
 csv="./baza.csv"
-bigReg="^[a-zA-Z]{2,},([1-9]|10),(([A-Za-z0-9]+((\.|\-|\_|\+)?[A-Za-z0-9]?)*[A-Za-z0-9]+)|[A-Za-z0-9]+)@(([A-Za-z0-9]+)+((\.|\-|\_)?([A-Za-z0-9]+)+)*)+\.([A-Za-z]{2,})+$"
-
 
 sortare(){
   clear
@@ -25,11 +23,11 @@ sortare(){
 stergere(){
   clear
   read -p "Introdu id-ul studentului de sters: " id
-  if [[ ! $(sed -n -e "/^$id/p" $csv) ]]
+  if [[ ! $(sed -n "/^$id/p" $csv) ]]
   then
     echo "id-ul nu a fost gasit"
   else
-    sed -i "/^$id/d" $csv
+    sed -i "/^$id\b/d" $csv
     echo "student sters"
   fi
   return
@@ -74,15 +72,39 @@ editareTot() {
   clear
   id=$1
   toBeReplaced=$2
-  read -p "Introdu campurile noi lipite urmate de ',' (fara id): " str
-    while [[ ! $str =~ $bigReg ]]
-    do
-      echo "ai introdus campurile gresit"
-      read -p "Introdu campurile noi lipite urmate de ',' (fara id)" str
-    done
+  read -p "Introduceti numele: " nume
+  while [[ ! "$nume" =~ ^[a-zA-Z]{2,}$ ]]
+  do
+    echo "nume invalid (cel putin 2 caractere si fara numere)"
+    read -p "Reintroduceti nume: " nume
+  done
+  read -p "Introduceti nota SO: " nota
+  while [[ ! $nota =~ ^([1-9]|10)$ ]]
+  do
+    echo "nota invalida"
+    read -p "Reintroduceti nota: " nota
+  done
+  read -p "Introduceti email-ul: " mail
+  while [[ ! "$mail" =~ ^(([A-Za-z0-9]+((\.|\-|\_|\+)?[A-Za-z0-9]?)*[A-Za-z0-9]+)|[A-Za-z0-9]+)@(([A-Za-z0-9]+)+((\.|\-|\_)?([A-Za-z0-9]+)+)*)+\.([A-Za-z]{2,})+$ ]]
+  do
+    echo "adresa de email invalida"
+    read -p "Reintroduceti email-ul: " mail
+  done
+  str="$nume,$nota,$mail"
   final=$id','$str
   echo $final
   sed -i -e "s/$toBeReplaced/$final/" $csv
+}
+
+nrCif(){
+  nr=$1
+  k=0
+  while [[ ! $nr -eq 0 ]]
+  do
+    nr=$(($nr/10))
+    ((k++))
+  done
+  return $k
 }
 
 editare(){
@@ -91,18 +113,18 @@ editare(){
   while [[ ! $existingId =~ ^[0-9]+$ ]]
   do
     echo "id invalid"
-    read -p "Reintroduceti id-ul: " nota
+    read -p "Reintroduceti id-ul: " existingId
   done
-  if [[ $(sed -n -e "/^$existingId\b/p" $csv) ]]
+  if [[ $(sed -n "/^$existingId\b/p" $csv) ]]
   then
-    repl=$(sed -n -e "/^$existingId\b/p" $csv) #te am gasit hehe
+    repl=$(sed -n "/^$existingId\b/p" $csv) #te am gasit hehe
     echo $repl
     echo -e "Introdu operatia de actualizare:\n
     '1' - editare nume,\n
     '2' - editare nota,\n
     '3' - editare mail,\n
     '4' - editarea tuturor campurilor,\n
-    (*orice altceva) - exit 1"
+    (*orice altceva) - inapoi in meniul principal"
     read -p "Introduceti operatia dorita: " str
     case "$str" in
     1) editareNume $existingId;;
@@ -114,8 +136,6 @@ editare(){
     
   else
     echo "id-ul nu exista"
-    len=$(awk 'END { print NR }' $csv)
-    ((len--))
     id=$(awk -F',' 'END { print $1 }' $csv)
     # echo $id
     # echo $existingId
@@ -125,19 +145,35 @@ editare(){
       read -p "1 - 'da', 2 - 'nu': " inp
       if [[ inp -eq "1" ]]
       then
-        read -p "Introdu campurile noi lipite urmate de ',' (fara id): " str
-        while [[ ! $str =~ $bigReg ]]
+        read -p "Introduceti numele: " nume
+        while [[ ! "$nume" =~ ^[a-zA-Z]{2,}$ ]]
         do
-          echo "ai introdus campurile gresit"
-          read -p "Introdu campurile noi lipite urmate de ',' (fara id)" str
+          echo "nume invalid (cel putin 2 caractere si fara numere)"
+          read -p "Reintroduceti nume: " nume
         done
+        read -p "Introduceti nota SO: " nota
+        while [[ ! $nota =~ ^([1-9]|10)$ ]]
+        do
+          echo "nota invalida"
+          read -p "Reintroduceti nota: " nota
+        done
+        read -p "Introduceti email-ul: " mail
+        while [[ ! "$mail" =~ ^(([A-Za-z0-9]+((\.|\-|\_|\+)?[A-Za-z0-9]?)*[A-Za-z0-9]+)|[A-Za-z0-9]+)@(([A-Za-z0-9]+)+((\.|\-|\_)?([A-Za-z0-9]+)+)*)+\.([A-Za-z]{2,})+$ ]]
+        do
+          echo "adresa de email invalida"
+          read -p "Reintroduceti email-ul: " mail
+        done
+        str="$nume,$nota,$mail"
         final=$existingId','$str
-          # echo "not yet implemented"
-          str=$(awk -v sid="$existingId" -F',' '{if(NR>1 && sid < $1) print NR}' $csv)
-          poz=${str::1}
-          ((poz--))
-          # echo $poz
-          sed -i "$poz a $final" $csv
+        searchId=$(awk -v sid="$existingId" -F',' '{if(NR>1 && sid < $1) print NR}' $csv)
+        nrCif $existingId
+        p=$?
+        ((p++))
+        # echo $p
+        poz=${searchId::$p}
+        ((poz--))
+        # echo $poz 
+        sed -i "$poz a $final" $csv
       else
         return
       fi
@@ -183,7 +219,7 @@ afisare(){
   while IFS="," read -r id nume nota mail #IFS = internal field separator
     do
       echo -e "$id $nume $nota $mail"
-  done < <(tail -n +1 $csv) 
+  done < $csv 
 }
 
 init() {
@@ -203,8 +239,8 @@ init
 echo -e "Operatii disponibile: \n
 '1' - afisare csv,\n
 '2' - adaugare student,\n
-'3' - editare/inserare ;) studenti urmat de id,\n
-'4' - stergere studenti urmat de id,\n
+'3' - editare/inserare studenti,\n
+'4' - stergere studenti,\n
 '5' - sortare studenti descrescator in functie de nota (afisare primii 3),\n
 '*orice altceva*' - pt a inchide scriptul"
 read -p "Introduceti operatia dorita: " inp
@@ -222,8 +258,8 @@ do
   echo -e "Operatii disponibile: \n
   '1' - afisare csv,\n
   '2' - adaugare student,\n
-  '3' - editare/inserare ;) studenti urmat de id,\n
-  '4' - stergere studenti urmat de id,\n
+  '3' - editare/inserare studenti,\n
+  '4' - stergere studenti,\n
   '5' - sortare studenti descrescator in functie de nota (afisare primii 3),\n
   '*orice altceva*' - pt a inchide scriptul"
   read -p "Introduceti operatia dorita: " inp
