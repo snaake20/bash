@@ -1,7 +1,6 @@
 #!/bin/bash
 csv="./baza.csv"
 
-
 sortare(){
   clear
   # note=()
@@ -24,7 +23,7 @@ sortare(){
 stergere(){
   clear
   read -p "Introdu id-ul studentului de sters: " id
-  if [[ ! $(sed -n "/^$id/p" $csv) ]]
+  if [[ ! $(sed -n "/^$id\b/p" $csv) ]]
   then
     echo "id-ul nu a fost gasit"
   else
