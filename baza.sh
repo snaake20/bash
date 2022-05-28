@@ -1,6 +1,7 @@
 #!/bin/bash
 csv="./baza.csv"
 
+
 sortare(){
   clear
   # note=()
