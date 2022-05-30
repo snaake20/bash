@@ -42,6 +42,7 @@ editareNume(){
   done
   id=$1
   awk -F',' -v id="$id" -v nume="$replace" 'BEGIN { OFS = FS } $1 == id { $2 = nume }1' $csv > tmpfile && mv tmpfile "$csv"
+  return
 }
 
 editareNota(){
@@ -66,6 +67,7 @@ editareMail(){
   done
   id=$1
   awk -F',' -v id="$id" -v email="$replace" 'BEGIN { OFS = FS } $1 == id { $4 = email }1' $csv > tmpfile && mv tmpfile "$csv"
+  return
 }
 
 editareTot() {
@@ -92,8 +94,9 @@ editareTot() {
   done
   str="$nume,$nota,$mail"
   final=$id','$str
-  echo $final
+  echo "$final"
   sed -i -e "s/$toBeReplaced/$final/" $csv
+  return
 }
 
 nrCif(){
@@ -118,7 +121,7 @@ editare(){
   if [[ $(sed -n "/^$existingId\b/p" $csv) ]]
   then
     repl=$(sed -n "/^$existingId\b/p" $csv) #te am gasit hehe
-    echo $repl
+    echo "$repl"
     echo -e "Introdu operatia de actualizare:\n
     '1' - editare nume,\n
     '2' - editare nota,\n
