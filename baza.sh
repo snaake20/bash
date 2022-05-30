@@ -3,20 +3,7 @@ csv="./baza.csv"
 
 sortare(){
   clear
-  # note=()
-  # note+=$(awk -F',' '{ if (NR>1) print $3}' $csv)
-  # nume=()
-  # nume+=$(awk -F',' '{ if (NR>1) print $2}' $csv)
-  # for i in $note
-  # do
-  #   echo $i
-  # done
-  # for j in $nume
-  # do
-  #   echo $j
-  # done
   awk -F',' '{ if (NR>1) print $3 "\t" $2}' $csv | sort -n -r | head -n 3
-  
   return
 }
 
@@ -54,7 +41,6 @@ editareNota(){
   done
   id=$1
   awk -F',' -v id="$id" -v nota="$replace" 'BEGIN { OFS = FS } $1 == id { $3 = nota }1' $csv > tmpfile && mv tmpfile "$csv"
-  # sed -i -E "s/^$id\,.\,([1-9]|10)\,.$/$replace/" $csv
   return
 }
 
@@ -95,7 +81,7 @@ editareTot() {
   str="$nume,$nota,$mail"
   final=$id','$str
   echo "$final"
-  sed -i -e "s/$toBeReplaced/$final/" $csv
+  sed -i "s/$toBeReplaced/$final/" $csv
   return
 }
 
