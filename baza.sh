@@ -92,7 +92,7 @@ editareTot() {
   done
   str="$nume,$nota,$mail"
   final=$id','$str
-  echo $final
+  echo "$final"
   sed -i -e "s/$toBeReplaced/$final/" $csv
 }
 
@@ -118,7 +118,7 @@ editare(){
   if [[ $(sed -n "/^$existingId\b/p" $csv) ]]
   then
     repl=$(sed -n "/^$existingId\b/p" $csv) #te am gasit hehe
-    echo $repl
+    echo "$repl"
     echo -e "Introdu operatia de actualizare:\n
     '1' - editare nume,\n
     '2' - editare nota,\n
